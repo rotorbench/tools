@@ -26,6 +26,8 @@ type test struct {
 	pwm200     int
 	current200 float64
 	gpw200     float64
+	thr50      float64
+	curr50     float64
 }
 
 func (t *test) summarize() error {
@@ -52,12 +54,18 @@ func (t *test) summarize() error {
 
 	t.minVolt = math.MaxFloat64
 	has200 := false
+	has50 := false
 	for {
 		rec, err := c.Read()
 		if err != nil {
 			if err == io.EOF {
 				return nil
 			}
+			return err
+		}
+
+		pwm, err := strconv.Atoi(rec[idx["pwm"]])
+		if err != nil {
 			return err
 		}
 
@@ -76,12 +84,15 @@ func (t *test) summarize() error {
 
 		if floatField(rec, "thrust") >= 200 && !has200 {
 			has200 = true
-			t.pwm200, err = strconv.Atoi(rec[idx["pwm"]])
-			if err != nil {
-				return err
-			}
+			t.pwm200 = pwm
 			t.current200 = floatField(rec, "current")
 			t.gpw200 = floatField(rec, "gpwatt")
+		}
+
+		if pwm >= 1500 && !has50 {
+			has50 = true
+			t.curr50 = floatField(rec, "current")
+			t.thr50 = floatField(rec, "thrust")
 		}
 	}
 }
@@ -119,13 +130,14 @@ func main() {
 
 	fmt.Println(strings.Join([]string{"mfg", "size", "kv", "prop", "batt",
 		"maxrpm", "minvolt", "maxvolt", "maxcurr", "maxthr", "pwm200", "curr200", "gpw200",
+		"curr50", "thr50",
 		"filename"}, ","))
 
 	for _, t := range tests {
-		fmt.Printf("%v,%v,%v,%v,%v,%v,%v,%v,%v,%v,%v,%v,%v,%v\n",
+		fmt.Printf("%v,%v,%v,%v,%v,%v,%v,%v,%v,%v,%v,%v,%v,%v,%v,%v\n",
 			t.mfg, t.size, t.kv, t.prop, t.batt,
 			t.maxRpm, t.minVolt, t.maxVolt, t.maxCurrent, t.maxThrust,
-			t.pwm200, t.current200, t.gpw200,
+			t.pwm200, t.current200, t.gpw200, t.curr50, t.thr50,
 			t.filename)
 	}
 }
