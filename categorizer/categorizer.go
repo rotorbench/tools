@@ -130,14 +130,12 @@ func main() {
 
 	fmt.Println(strings.Join([]string{"mfg", "size", "kv", "prop", "batt",
 		"maxrpm", "minvolt", "maxvolt", "maxcurr", "maxthr", "pwm200", "curr200", "gpw200",
-		"curr50", "thr50",
-		"filename"}, ","))
+		"curr50", "thr50"}, ","))
 
 	for _, t := range tests {
-		fmt.Printf("%v,%v,%v,%v,%v,%v,%v,%v,%v,%v,%v,%v,%v,%v,%v,%v\n",
+		fmt.Printf("%v,%v,%v,%v,%v,%v,%v,%v,%v,%v,%v,%v,%v,%v,%v\n",
 			t.mfg, t.size, t.kv, t.prop, t.batt,
 			t.maxRpm, t.minVolt, t.maxVolt, t.maxCurrent, t.maxThrust,
-			t.pwm200, t.current200, t.gpw200, t.curr50, t.thr50,
-			t.filename)
+			t.pwm200, t.current200, t.gpw200, t.curr50, t.thr50)
 	}
 }
